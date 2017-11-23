@@ -1,0 +1,196 @@
+
+c언어 코딩시 유의할 점들 
+1. 함수에서 데이터 오류 처리를 할때 
+   함수의 시작 부분에서 미리 오류 처리를 하라 
+	 다중if ~else 구문으로 오류 처리를 하지 말고, 오류 발생시 함수를 종료하게 만들어라 
+
+	 int function(int x, int y)
+	 {
+	    if(x<0)
+			{
+				printf("오류");
+			}
+			else
+			{
+				if( y<0) 
+				{
+				}
+				else
+				{
+				}
+			}
+  }
+
+	이런 구조 보다는 
+	 int function(int x, int y)
+	 {
+			if( x < 0) return -1;
+			if( y < 0 ) return -1;
+	    정상적인 상황의 처리 
+			새로운 오류처리가 필요하다면 
+	    위에다 라인을 추가하라 
+
+
+2. 포인터 변수 사용시 
+   int *pInt = new int[10];
+
+	 ....
+	 ....
+	 delete []pInt;  //이때 컴파일러가 이 변수의 메모리를 수거하더라도 이미 
+	                   할당 받았던 기억까지 가져가지는 않는다 
+	 pInt=0; //습관처럼 붙이자 . 지역변수의 경우는 보통 문제가 되지 않지만 
+	           전역변수의 경우는 무조건 붙여야 한다 
+
+
+	 malloc, free 일때도 마찬가지다 
+
+3. 파일 오픈시 
+   FILE * fp = fopen(~~~)
+
+	 하나의 프로스세스에 파일을 오픈하면 클로즈 전에 재오픈은 되지 않는다 
+	 딱 한번만 가능하다. 
+	 가급적 함수를 만들때 파일 오픈과 클로즈가 한 함수내에서 만들어지도록 하자 
+	 나중에 파일 닫는걸 까먹거나 모르고 화일을 닫는 함수가 별도로 호출되지 않아 
+	 문제가 발생할 수 있다 
+	 void function()
+	 {
+
+	     FILE *fp = fopen("파일명");
+			 ........
+			 .......
+			 fclos(fp); //함수의 마지막 부분에 반드시 나타나게, 두 구문은 한 함수내에 존재해야
+			              한다 
+		}
+
+
+4.함수를 만들때 권한을 온전히 주자 
+예)정수를 입력받아야 할때 문자를 입력하면 scanf 함수가 동작하지 않는다 
+그렇다면 정수를 읽는 함수를 만들면 된다 
+
+int GetNumber()
+{
+  int temp;
+	int ret;
+
+	ret = scanf("%d", &temp);  //숫자를 읽기 원하는데 문자를 입력하면 반환값은 0이 된다 
+	                            //scanf함수의 반환값은 데이터를 제대로 읽어들인 갯수이다 
+															하나의 숫자를 읽으라고 했으므로 정상적으로 데이터를 읽었다면
+															1이 반환된다. 1이 아닌값이 반환되면 값을 읽지 못한상태이다 
+	while(ret!=1) 
+	{
+	    printf("정수를 입력하세요");
+			ret = scanf("%d", &temp);
+	}
+  
+	return temp;
+}
+
+
+5. break나 continue 문 최소화, 함수나 블럭이 길어질 수록 자주 쓰면 안된다 
+   코드 해석이 많이 힘들어진다 
+
+6. typedef 문을 적극 활용하자 
+   컴퓨터 장비를 관리하기 위한 프로그램을 작성한다고 할때 
+
+	 typedef int PRINTER;
+	 typedef int COMPUTER;
+	 typedef int SCANNER;
+	 typedef int MONITOR;
+
+	 PRINTER printer;
+	 COMPUTER computer;
+   SCANNER scanner;
+	 MONITOR monitor;
+
+	 .........
+
+	 type int MATRIX[3][3];
+
+	 MATRIX m1, m2, m3;
+
+	 function Add(MATRIX result, const MATRIX m1, const MATRIX m2);
+
+
+7. 중첩적인 구조를 회피하라 
+   switch(number)
+	 {
+	    case 1:
+				switch(value)
+				{
+					case 1:
+					   ............
+				}
+			case 2:
+			  switch(value2)
+				{
+					case 1:
+					   ............
+				}
+		}
+
+		시스템 프로그램을 하다보면 필연적으로 나타나는 구조인데 
+		내부 switch 문을 함수로 만들어서 변경해보자 
+	  switch(number)
+	  {
+	    case 1:
+				function1(value);
+				break;
+			case 2:
+			  function2(value);
+				break;
+		}
+
+8. 이차원배열, 이중 포인터 이상 나온다면 다시 한번 생각해보자 
+   삼차원 배열이 필요하다면 구조체와 구조체 배열을 활용해보자 
+	 삼중포인터는 진짜 시스템을 깽판 치지 않는이상 나와서는 안된다.
+
+
+9. 함수의 매개변수는 적을 수록 좋다. 그리고 call by pointer 보다는 
+반환값을 최대한 활용하자 
+
+int function(int arr[], int size, int *max, int *min)
+{
+	*max = arr[0];
+	*min = arr[0];
+	for(int i=1; i<len; i++)
+	{
+		if( arr[i] > *max ) 
+		{
+			*max = arr[i];
+		}
+		if( arr[i] < *min ) 
+		{
+			*min = arr[i];
+		}
+	}
+}
+
+막 포인터를 사용해서 멋있어 보인다 그러나 이렇게 만들지 말자
+아래 방법이 가능한지 먼저 생각해보자 
+int GetMaxPos(int arr[], int len)
+{
+	int pos = 0;
+	int max = arr[0];
+	for(int i=1; i<len; i++)
+	{
+		if( arr[i] > max ) 
+		{
+			max = arr[i];
+			pos = max;
+		}
+	}
+
+	return pos;
+}
+
+
+10. 프로젝트를 만들때 가장먼저 해야할 일은 필요한 구조체를 정의하는것이다 
+구조체를 미리 많이 만들어놓자 프로그램의 시작은 구조체의 정의로 시작한다 
+구조체를 다 만들면 절반이 끝난 일이다 
+
+
+11. 아무리 커다래 보이는 일도, 결국은 읽고 계산하고 출력하고의 일의 반복이다 
+코딩시 입력을 처리할때는 입력에 대한 부분만 먼저 생각하자 
+입력을 하면서 계산과 출력에 대한 생각은 하지 말자 
+한번에 하나만 생각하자 하나만 열심히 만들자 
+
