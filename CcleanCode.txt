@@ -1,38 +1,47 @@
-
 c언어 코딩시 유의할 점들 
+
+
 1. 함수에서 데이터 오류 처리를 할때 
    함수의 시작 부분에서 미리 오류 처리를 하라 
 	 다중if ~else 구문으로 오류 처리를 하지 말고, 오류 발생시 함수를 종료하게 만들어라 
 
 	 int function(int x, int y)
 	 {
-	    if(x<0)
+	        if(x<0)
+		{
+			printf("오류");
+		}
+		else
+		{
+			if( y<0) 
 			{
-				printf("오류");
 			}
 			else
 			{
-				if( y<0) 
-				{
-				}
-				else
-				{
-				}
 			}
-  }
+		}
+  	 }
 
-	이런 구조 보다는 
+	 이런 구조 보다는
+	 
+	 
+	  
 	 int function(int x, int y)
 	 {
 			if( x < 0) return -1;
 			if( y < 0 ) return -1;
-	    정상적인 상황의 처리 
+	 }
+			정상적인 상황의 처리 
 			새로운 오류처리가 필요하다면 
-	    위에다 라인을 추가하라 
+			위에다 라인을 추가하라 
+
+
+
+
 
 
 2. 포인터 변수 사용시 
-   int *pInt = new int[10];
+     int *pInt = new int[10];
 
 	 ....
 	 ....
@@ -41,11 +50,16 @@ c언어 코딩시 유의할 점들
 	 pInt=0; //습관처럼 붙이자 . 지역변수의 경우는 보통 문제가 되지 않지만 
 	           전역변수의 경우는 무조건 붙여야 한다 
 
+	 새로 할당할 때는 
+	 if(pInt == 0)
+		pInt = new int[10];
+
+	 이렇게 pInt가 0인 것을 확인해주는 것이 좋다
 
 	 malloc, free 일때도 마찬가지다 
 
 3. 파일 오픈시 
-   FILE * fp = fopen(~~~)
+     FILE * fp = fopen(~~~)
 
 	 하나의 프로스세스에 파일을 오픈하면 클로즈 전에 재오픈은 되지 않는다 
 	 딱 한번만 가능하다. 
@@ -55,12 +69,12 @@ c언어 코딩시 유의할 점들
 	 void function()
 	 {
 
-	     FILE *fp = fopen("파일명");
+		     FILE *fp = fopen("파일명");
 			 ........
 			 .......
 			 fclos(fp); //함수의 마지막 부분에 반드시 나타나게, 두 구문은 한 함수내에 존재해야
 			              한다 
-		}
+	 }
 
 
 4.함수를 만들때 권한을 온전히 주자 
@@ -79,7 +93,8 @@ int GetNumber()
 	while(ret!=1) 
 	{
 	    printf("정수를 입력하세요");
-			ret = scanf("%d", &temp);
+		fflush(stdin);//버퍼에 남아 있는 것을 빨리 내보내기
+		ret = scanf("%d", &temp);
 	}
   
 	return temp;
@@ -133,12 +148,12 @@ int GetNumber()
 	  switch(number)
 	  {
 	    case 1:
-				function1(value);
-				break;
-			case 2:
-			  function2(value);
-				break;
-		}
+			function1(value);
+			break;
+		case 2:
+		    function2(value);
+			break;
+	   }
 
 8. 이차원배열, 이중 포인터 이상 나온다면 다시 한번 생각해보자 
    삼차원 배열이 필요하다면 구조체와 구조체 배열을 활용해보자 
